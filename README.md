@@ -1,6 +1,6 @@
-# Deepfake Proactive Defense
-This project is using the implementation of two methods to defend agains deepfake manipulations:
-- Artificial fingerprints: embed a fingerprint into an image in order to know where the images come from
+# Deepfakes Hybrid Defense
+This project is an hybrid aproach to defend agains deepfakes, using the implementation of two methods to defend agains deepfake manipulations:
+- Artificial fingerprints: embed a fingerprint into an image in order to know where the images comes from
 - Antiforgery: embed an invisible disruption into an image to disturb the generator model of deepfakes
 
 ## Prerequisites
@@ -10,44 +10,43 @@ This project was modified to run on CPU
 - To install the other Python dependencies, run `pip install -r requirements.txt`
 
 
-# Artificial GAN Fingerprints
-The complete information can be found in the following links:
-(This is a modified version of the README.md file) 
-This project was modified to make it work with 256x256 images.
-
-### [Artificial Fingerprinting for Generative Models: Rooting Deepfake Attribution in Training Data](https://arxiv.org/pdf/2007.08457.pdf)
-[Ning Yu](https://ningyu1991.github.io/)\*, [Vladislav Skripniuk](https://www.linkedin.com/in/vladislav-skripniuk-8a8891143/?originalSubdomain=ru)\*, [Sahar Abdelnabi](https://s-abdelnabi.github.io/), [Mario Fritz](https://cispa.saarland/group/fritz/)<br>
-*Equal contribution<br>
-ICCV 2021 Oral
-
-### [paper](https://arxiv.org/pdf/2007.08457.pdf) | [project](https://ningyu1991.github.io/projects/ArtificialGANFingerprints.html) | [poster](https://ningyu1991.github.io/homepage_files/poster_ArtificialGANFingerprints.pdf) | [video](https://www.youtube.com/watch?v=j8bcOHhu4Lg&t=12s)
-
-
 ## Abstract
+In a digital environment saturated with information, the proliferation of technologies such as Generative Adversarial Networks (GANs) has given rise to a growing threat known
+as deepfakes. These GANs facilitate the manipulation of image attributes, from hair color to age and gender, allowing key aspects of identity to be altered, which can be used to spread disinformation, impersonate identities and manipulate public perception for malicious or fraudulent purposes. In response to this challenge, this thesis attempts to propose a proactive defense strategy against the misuse of image generation tools applied for unauthorized visual manipulation. The proposal is based on the fusion of two methods: The first method ArtificialGANFingerprints (Yu et al., 2021) that incorporates fingerprints in images to allow their recovery after being transformed by the GAN, and the second method AntiForgery (R. Wang et al., 2022) that introduces imperceptible visual perturbations to degrade the quality of the generated images and obtain unrealistic or artifactual results. These combined methods allow, on the one hand, to track and authenticate the origin of the images and, on the other, to reduce the effectiveness of GANs in generating trustworthy visual content. The results obtained show that this hybrid approach is a promising preventive measure against the proliferation of manipulated and potentially harmful content in digital environments.
 
 
-  
+## Preparation
 ## Datasets
-- We experiment on one datasets. Download and unzip images into a folder (newdownload.sh).
-  - [CelebA Dataset] 10.000 images for fingerprint autoencoder training (encoder and decoder).
-  
+- We experiment on one dataset. Download and unzip images into a folder.
+- [CelebA Dataset] 10.000 images were used for fingerprint autoencoder training (encoder and decoder).
+
+**CelebA Dataset**
+
+```
+bash download.sh celeba
+```
+More information about the CelebA dataset can be found [here](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html). 
+
+**StarGAN Model**
+
+```
+bash download.sh pretrained-celeba-256x256
+```
+
+If you want to train an encoder and decoder from the scratch you can use the next script, or use the pretrained model for 256x256 images.
 ## Fingerprint autoencoder training
 - Run, e.g.,
   ```
   python train_fingerprints.py \
   --data_dir /path/to/images/ \
-  --use_celeba_preprocessing \
   --image_resolution 256 \
   --output_dir /path/to/output/ \
   --fingerprint_length 100 \
-  --batch_size 64
+  --batch_size 4
   ```
   where
-  - `use_celeba_preprocessing` needs to be active if and only if using CelebA aligned and cropped images.
-  - `image_resolution` indicates the image resolution for training. All the images in `data_dir` is center-cropped according to the shorter side and then resized to this resolution. When `use_celeba_preprocessing` is active, `image_resolution` has to be set as 128.
+  - `image_resolution` indicates the image resolution for training. All the images in `data_dir` is center-cropped according to the shorter side and then resized to this resolution. 
   - `output_dir` contains model snapshots, image snapshots, and log files. For model snapshots, `*_encoder.pth` and `*_decoder.pth` correspond to the fingerprint encoder and decoder respectively.
-
-
 
 ## Fingerprint embedding and detection
 - For **fingerprint embedding**, run, e.g.,
@@ -55,15 +54,13 @@ ICCV 2021 Oral
   python embed_fingerprints.py \
   --encoder_path /path/to/encoder/ \
   --data_dir /path/to/images/ \
-  --use_celeba_preprocessing \
-  --image_resolution 128 \
+  --image_resolution 256 \
   --output_dir /path/to/output/ \
   --identical_fingerprints \
-  --batch_size 64
+  --batch_size 4
   ```
   where
-  - `use_celeba_preprocessing` needs to be active if and only if using CelebA aligned and cropped images.
-  - `image_resolution` indicates the image resolution for fingerprint embedding. All the images in `data_dir` is center-cropped according to the shorter side and then resized to this resolution. **It should match the input resolution for the well-trained encoder read from `encoder_path`**. When `use_celeba_preprocessing` is active, `image_resolution` has to be set as 128.
+  - `image_resolution` indicates the image resolution for fingerprint embedding. All the images in `data_dir` is center-cropped according to the shorter side and then resized to this resolution. **It should match the input resolution for the well-trained encoder read from `encoder_path`**.
   - `output_dir` contains embedded fingerprint sequence for each image in `embedded_fingerprints.txt` and fingerprinted images in `fingerprinted_images/`.
   - `identical_fingerprints` needs to be active if and only if all the images need to be fingerprinted with the same fingerprint sequence. 
   
@@ -72,40 +69,34 @@ ICCV 2021 Oral
   python detect_fingerprints.py \
   --decoder_path /path/to/decoder/ \
   --data_dir /path/to/fingerprinted/images/ \
-  --image_resolution 128 \
+  --image_resolution 256 \
   --output_dir /path/to/output/ \
-  --batch_size 64
+  --batch_size 4
   ```
   where
   - `output_dir` contains detected fingerprint sequence for each image in `detected_fingerprints.txt`.
   - `image_resolution` indicates the image resolution for fingerprint detection. All the images in `data_dir` is center-cropped according to the shorter side and then resized to this resolution. **It should match the input resolution for the well-trained decoder read from `decoder_path`**.
+  - You must add a base fingerprint in the `detect_fingerprints.py` file from the `embedded_fingerprints.txt` in order to make the detection method work properly.
 
 
+## Testing the method
 
-# Anti-Forgery
-An example of **[Anti-Forgery: Towards a Stealthy and Robust DeepFake Disruption Attack via Adversarial Perceptual-aware Perturbations](https://arxiv.org/abs/2206.00477)** (to be presented at the **IJCAI-ECAI 2022**). This repository contains code for crafting perceptual-aware perturbation in the Lab color space to attack an image-to-image translation network. 
-
-## Preparation
-**CelebA Dataset**
-
+There to posibles pipelines to use the method with StarGAN on the CelebA dataset.
+The first:
+  1. Embed the fingerprints into the images
+  2. Use the adversarial attack
 ```
-bash newdownload.sh celeba
-```
-**StarGAN Model**
-
-```
-bash newdownload.sh pretrained-celeba-256x256
-```
-
-More information about the CelebA dataset can be found [here](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html). 
-
-## Attack Testing
-
-Here is a simple example of  testing our method to attack StarGAN on the CelebA dataset.
-```
-# Test
 python main.py --mode test --image_size 256 --c_dim 5 --selected_attrs Black_Hair Blond_Hair Brown_Hair Male Young --model_save_dir='stargan_celeba_256/models' --result_dir='./results' --test_iters 200000 --attack_iters 100 --batch_size 1
 ```
+  3. Detect the fingerprints from the images
+
+The Second (branch/adv-fing):
+  1. Use the adversarial attack adding the flag --fingerprint   
+```
+# Test
+python main.py --mode test --image_size 256 --c_dim 5 --selected_attrs Black_Hair Blond_Hair Brown_Hair Male Young --model_save_dir=stargan_celeba_256\models --result_dir=results --test_iters 200000 --attack_iters 100 --batch_size 1 --fingerprint
+```
+  2. Detect the fingerprints from the images
 
 
 
