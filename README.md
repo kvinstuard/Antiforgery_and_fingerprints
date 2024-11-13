@@ -81,7 +81,7 @@ If you want to train an encoder and decoder from the scratch you can use the nex
 
 ## Testing the method
 
-There to posibles pipelines to use the method with StarGAN on the CelebA dataset.
+There two possibles pipelines to use the method with StarGAN on the CelebA dataset.
 The first:
   1. Embed the fingerprints into the images
   2. Use the adversarial attack
@@ -89,6 +89,10 @@ The first:
 python main.py --mode test --image_size 256 --c_dim 5 --selected_attrs Black_Hair Blond_Hair Brown_Hair Male Young --model_save_dir='stargan_celeba_256/models' --result_dir='./results' --test_iters 200000 --attack_iters 100 --batch_size 1
 ```
   3. Detect the fingerprints from the images
+
+# Pipeline: org -> fingerprint -> adversarial -> gan
+![Pipeline: original-fingerprint-adversarial-gan](https://github.com/kvinstuard/Antiforgery_and_fingerprints/raw/main/assets/escenario5b.png)
+
 
 The Second (branch/adv-fing):
   1. Use the adversarial attack adding the flag --fingerprint   
@@ -98,7 +102,9 @@ python main.py --mode test --image_size 256 --c_dim 5 --selected_attrs Black_Hai
 ```
   2. Detect the fingerprints from the images
 
+# Pipeline: org  -> adversarial -> fingerprint -> gan
 
+![Pipeline: original-fingerprint-adversarial-gan](https://github.com/kvinstuard/Antiforgery_and_fingerprints/raw/main/assets/escenario4b.png)
 
 ## Citation
   ```
