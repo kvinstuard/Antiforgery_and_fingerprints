@@ -1,7 +1,10 @@
 # Deepfakes Hybrid Defense
 This project is an hybrid aproach to defend agains deepfakes, using the implementation of two methods to defend agains deepfake manipulations:
-- Artificial fingerprints: embed a fingerprint into an image in order to know where the images comes from
-- Antiforgery: embed an invisible disruption into an image to disturb the generator model of deepfakes
+- Artificial fingerprints: embed a fingerprint into an image in order to know where the images comes from.
+The implementation can be found at [ArtificialGANFingerprints](https://github.com/ningyu1991/ArtificialGANFingerprints/).
+
+- Antiforgery: embed an invisible disruption into an image to disturb the generator model of deepfakes.
+The implementation can be found at [AntiForgery](https://github.com/AbstractTeen/AntiForgery).
 
 ## Prerequisites
 This project was modified to run on CPU
@@ -106,7 +109,7 @@ python main.py --mode test --image_size 256 --c_dim 5 --selected_attrs Black_Hai
 
 ![Pipeline: original-fingerprint-adversarial-gan](https://github.com/kvinstuard/Antiforgery_and_fingerprints/raw/main/assets/escenario4b.png)
 
-## Citation
+## References
   ```
   @inproceedings{yu2021artificial,
     author={Yu, Ning and Skripniuk, Vladislav and Abdelnabi, Sahar and Fritz, Mario},
