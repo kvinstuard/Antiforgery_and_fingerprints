@@ -1,0 +1,8 @@
+data/*
+__pycache__/
+.venv
+output/fingerprinted_images
+output/fingerprinted_images_200k
+output/logs
+all_scalars.json
+results/*
