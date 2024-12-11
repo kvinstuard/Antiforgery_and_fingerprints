@@ -107,7 +107,7 @@ python main.py --mode test --image_size 256 --c_dim 5 --selected_attrs Black_Hai
 
 # Pipeline: org  -> adversarial -> fingerprint -> gan
 
-![Pipeline: original-fingerprint-adversarial-gan](https://github.com/kvinstuard/Antiforgery_and_fingerprints/raw/main/assets/escenario4b.png)
+![Pipeline: original-fingerprint-adversarial-gan](https://github.com/kvinstuard/Antiforgery_and_fingerprints/raw/main/assets/escenario4_final.png)
 
 ## References
   ```
