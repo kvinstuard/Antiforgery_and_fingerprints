@@ -10,6 +10,16 @@ from data_loader import get_loader
 from utils import *
 from model import Generator, Discriminator
 from fingerprint_models import StegaStampEncoder
+from torchvision import transforms
+from PIL import Image
+
+def read_image_as_tensor(image_path):
+    transform = transforms.Compose([
+        transforms.ToTensor()
+    ])
+    image = Image.open(image_path)
+    return transform(image).unsqueeze(0)
+
 
 """
 Test and evaluate a trained model (StarGAN) on the dataset CelebA.
@@ -153,6 +163,8 @@ def main():
         adv_image_path_no_watermark = os.path.join(config.adv_image_dir, '{}-adv-image-no-watermark.jpg'.format(i + 1))
         save_image(denorm(x_adv.data.cpu()), adv_image_path_no_watermark, nrow=1, padding=0)
 
+        x_adv = read_image_as_tensor(adv_image_path_no_watermark).to(x_real.device)
+
         # Apply fingerprint (watermark)
         if config.fingerprint:
             x_adv = embed_fingerprints_for_gan(x_adv, 
@@ -162,7 +174,8 @@ def main():
 
         # Save the adversarial image with fingerprint
         adv_image_path_with_watermark = os.path.join(config.adv_image_dir, '{}-adv-image-with-watermark.jpg'.format(i + 1))
-        save_image(denorm(x_adv.data.cpu()), adv_image_path_with_watermark, nrow=1, padding=0)
+        # Avoding denormalization
+        save_image(x_adv.data.cpu(), adv_image_path_with_watermark, nrow=1, padding=0)
 
         
         for idx, c_trg in enumerate(c_trg_list):
